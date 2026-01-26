@@ -19,9 +19,10 @@ export const AuthProvider = ({ children }) => {
         const interceptor = axios.interceptors.response.use(
             (response) => response,
             (error) => {
-                if (error.response?.status === 401) {
+                const isAuthRequest = error.config?.url?.includes('/api/auth/login') || error.config?.url?.includes('/api/auth/signup');
+                if (error.response?.status === 401 && !isAuthRequest) {
                     logout();
-                    window.location.reload(); // Refresh to show login screen
+                    window.location.reload();
                 }
                 return Promise.reject(error);
             }
