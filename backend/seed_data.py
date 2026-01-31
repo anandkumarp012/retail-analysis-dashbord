@@ -18,9 +18,9 @@ async def seed_data():
     
     print("Seeding Products...")
     products = [
-        {"product_id": 101, "product_name": "Wireless Mouse", "category": "Electronics", "unit_price": 25.0, "current_inventory": 150},
-        {"product_id": 102, "product_name": "Mechanical Keyboard", "category": "Electronics", "unit_price": 80.0, "current_inventory": 50},
-        {"product_id": 103, "product_name": "USB-C Cable", "category": "Accessories", "unit_price": 12.0, "current_inventory": 300},
+        {"product_id": 101, "product_name": "Wireless Mouse", "category": "Electronics", "unit_price": 1299.0, "current_inventory": 150},
+        {"product_id": 102, "product_name": "Mechanical Keyboard", "category": "Electronics", "unit_price": 4500.0, "current_inventory": 50},
+        {"product_id": 103, "product_name": "USB-C Cable", "category": "Accessories", "unit_price": 499.0, "current_inventory": 300},
     ]
     
     for p in products:

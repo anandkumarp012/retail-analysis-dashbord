@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { LayoutDashboard, Upload, TrendingUp, Package, Settings as SettingsIcon, Menu, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, Upload, TrendingUp, Package, Settings as SettingsIcon, Menu, LogOut, User, Users } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
 import UploadData from './pages/UploadData';
 import Forecast from './pages/Forecast';
 import Inventory from './pages/Inventory';
 import Settings from './pages/Settings';
+import Team from './pages/Team';
 import Login from './pages/Login';
 
 function AppContent() {
@@ -61,6 +62,8 @@ function AppContent() {
         return <Inventory />;
       case 'settings':
         return <Settings />;
+      case 'team':
+        return <Team />;
       default:
         return <Dashboard />;
     }
@@ -82,6 +85,7 @@ function AppContent() {
           <NavItem icon={<Upload size={20} />} label="Data Upload" active={activeTab === 'upload'} onClick={() => setActiveTab('upload')} expanded={isSidebarOpen} />
           <NavItem icon={<TrendingUp size={20} />} label="Forecast Models" active={activeTab === 'forecast'} onClick={() => setActiveTab('forecast')} expanded={isSidebarOpen} />
           <NavItem icon={<Package size={20} />} label="Inventory Plan" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} expanded={isSidebarOpen} />
+          <NavItem icon={<Users size={20} />} label="Team" active={activeTab === 'team'} onClick={() => setActiveTab('team')} expanded={isSidebarOpen} />
           <NavItem icon={<SettingsIcon size={20} />} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} expanded={isSidebarOpen} />
         </nav>
 

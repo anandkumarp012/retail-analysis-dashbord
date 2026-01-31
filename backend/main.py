@@ -135,10 +135,15 @@ async def upload_sales_data(
         def clean_float(val):
             if pd.isna(val) or val == '': return 0.0
             if isinstance(val, (int, float)): return float(val)
+            s = str(val).strip()
+            # Check for USD symbol to trigger conversion
+            is_usd = '$' in s
             # Remove currency symbols, commas, and spaces
-            s = str(val).replace('$', '').replace(',', '').replace(' ', '').strip()
+            s = s.replace('$', '').replace('₹', '').replace('Rs.', '').replace(',', '').replace(' ', '').strip()
             try:
-                return float(s)
+                num = float(s)
+                # Convert to INR if it was in USD (approx rate 83.5)
+                return num * 83.5 if is_usd else num
             except:
                 return 0.0
 
@@ -228,7 +233,7 @@ async def get_dashboard_stats(db: AsyncIOMotorDatabase = Depends(get_database), 
     rev_res = await db.sales.aggregate([{"$group": {"_id": None, "t": {"$sum": "$revenue"}}}]).to_list(1)
     total_rev = rev_res[0]["t"] if rev_res else 0
     return {
-        "total_revenue": f"${total_rev:,.2f}",
+        "total_revenue": f"₹{total_rev:,.2f}",
         "total_products": await db.products.count_documents({}),
         "high_risk_count": await db.recommendations.count_documents({"risk_level": "HIGH"}),
         "total_risk_count": await db.recommendations.count_documents({"risk_level": {"$in": ["HIGH", "MEDIUM", "OVERSTOCK"]}}),

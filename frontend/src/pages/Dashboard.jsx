@@ -20,7 +20,7 @@ const KPICard = ({ title, value, change, trend, icon: Icon, color }) => (
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
-        total_revenue: '$0',
+        total_revenue: '₹0',
         total_products: 0,
         high_risk_count: 0,
         total_risk_count: 0
@@ -142,8 +142,8 @@ const Dashboard = () => {
                                         ID: <span className="text-slate-200">{item.product_id}</span>
                                     </div>
                                     <div className={`text-xs mt-1 font-bold ${item.risk_level === 'HIGH' ? 'text-red-400' :
-                                            item.risk_level === 'OVERSTOCK' ? 'text-blue-400' :
-                                                'text-yellow-400'
+                                        item.risk_level === 'OVERSTOCK' ? 'text-blue-400' :
+                                            'text-yellow-400'
                                         }`}>
                                         {item.risk_level} RISK
                                     </div>
