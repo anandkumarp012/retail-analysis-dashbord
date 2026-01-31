@@ -3,8 +3,13 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import datetime
 import random
 
-MONGO_URL = "mongodb://localhost:27017"
-DATABASE_NAME = "retail_dashboard"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "retail_dashboard")
 
 async def seed_data():
     client = AsyncIOMotorClient(MONGO_URL)
