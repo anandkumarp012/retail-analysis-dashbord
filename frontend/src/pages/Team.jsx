@@ -1,8 +1,4 @@
 import { Github, Linkedin, Mail, Code, Palette, Brain, Server, Globe } from 'lucide-react';
-import anandImg from '../assets/anand.png';
-import varshiniImg from '../assets/varshini.png';
-import sriyaImg from '../assets/sriya.png';
-import deekshitaImg from '../assets/deekshita.png';
 
 const TeamMember = ({ name, role, responsibilities, image, icon: Icon }) => (
     <div className="group relative bg-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 hover:bg-card/60 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 overflow-hidden">
@@ -12,11 +8,17 @@ const TeamMember = ({ name, role, responsibilities, image, icon: Icon }) => (
         <div className="relative flex flex-col items-center text-center">
             <div className="relative mb-6">
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                <img
-                    src={image}
-                    alt={name}
-                    className="relative w-32 h-32 rounded-2xl object-cover border-2 border-background shadow-xl transform group-hover:scale-105 transition-transform duration-500"
-                />
+                {image ? (
+                    <img
+                        src={image}
+                        alt={name}
+                        className="relative w-32 h-32 rounded-2xl object-cover border-2 border-background shadow-xl transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                ) : (
+                    <div className="relative w-32 h-32 rounded-2xl bg-muted flex items-center justify-center border-2 border-background shadow-xl transform group-hover:scale-105 transition-transform duration-500">
+                        <span className="text-4xl font-bold text-muted-foreground">{name.charAt(0)}</span>
+                    </div>
+                )}
                 <div className="absolute -bottom-2 -right-2 p-2 bg-primary rounded-xl text-primary-foreground shadow-lg transform group-hover:rotate-12 transition-transform duration-300">
                     <Icon size={18} />
                 </div>
@@ -52,7 +54,7 @@ const Team = () => {
             name: "P Anand Kumar",
             role: "Frontend Developer",
             icon: Code,
-            image: anandImg,
+            image: "",
             responsibilities: [
                 "Developed the React-based web application",
                 "Integrated FastAPI endpoints with UI",
@@ -63,7 +65,7 @@ const Team = () => {
             name: "Sri Varshini",
             role: "UI/UX Designer",
             icon: Palette,
-            image: varshiniImg,
+            image: "/Varshini.jpg",
             responsibilities: [
                 "Designed user-friendly dashboard layouts",
                 "Selected color themes and icons",
@@ -74,7 +76,7 @@ const Team = () => {
             name: "Sriya",
             role: "ML Engineer",
             icon: Brain,
-            image: sriyaImg,
+            image: "",
             responsibilities: [
                 "Built demand forecasting models",
                 "Handled data preprocessing and feature engineering",
@@ -85,7 +87,7 @@ const Team = () => {
             name: "Deekshita",
             role: "Backend Developer",
             icon: Server,
-            image: deekshitaImg,
+            image: "",
             responsibilities: [
                 "Developed FastAPI backend services",
                 "Connected ML models to APIs",
