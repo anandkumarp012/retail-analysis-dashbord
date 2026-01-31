@@ -83,9 +83,19 @@ MONGO_URL=mongodb://localhost:27017
 DATABASE_NAME=retail_dashboard
 ```
 
+## ✨ Key Features
+
+- **AI Demand Forecasting**: Hybrid model using **Facebook Prophet** and **XGBoost** for precise predictive analytics.
+- **Dynamic Dashboard**: Real-time KPI tracking for sales, inventory risk, and product movement.
+- **Smart Data Adapter**: Handles any retail CSV format with automatic column mapping.
+- **Currency Intelligence**: Automatically detects and converts USD ($) to Indian Rupees (₹) during data upload.
+- **Team Hub**: Dedicated section showcasing the project contributors and their roles.
+- **Inventory Planning**: Automated reorder recommendations based on lead times and safety stocks.
+
 ## 📝 Usage
 
 1. **Login**: Use default credentials or sign up.
-2. **Upload Data**: Go to the "Upload Data" section and upload a CSV with sales history (SKU, Date, Quantity).
-3. **Forecast**: The AI will automatically process the data and generate forecasts.
-4. **Dashboard**: View trends, KPIs, and inventory risk alerts.
+2. **Upload Data**: Go to the "Data Upload" section. The system automatically handles currency symbols and converts USD to INR if needed.
+3. **Forecast**: Navigate to "Forecast Models" to see AI predictions for specific products.
+4. **Team**: Visit the "Team" page to see project contributors and development roles.
+5. **Inventory**: Check the "Inventory Plan" for AI-recommeneded reorder quantities and risk levels.
