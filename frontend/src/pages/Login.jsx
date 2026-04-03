@@ -2,6 +2,32 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, UserPlus, AlertCircle, Loader2 } from 'lucide-react';
 
+const getAuthErrorMessage = (err) => {
+    if (!err) return 'Authentication failed';
+
+    // Axios network errors usually mean backend is not running/reachable.
+    if (err.code === 'ERR_NETWORK' || (err.message && err.message.toLowerCase().includes('network error'))) {
+        return 'Cannot reach backend at 127.0.0.1:8000. Start the FastAPI server and try again.';
+    }
+
+    const detail = err.response?.data?.detail;
+    if (Array.isArray(detail)) {
+        const first = detail[0];
+        return first?.msg || 'Request validation failed';
+    }
+    if (typeof detail === 'string' && detail.trim()) {
+        return detail;
+    }
+    if (typeof err.response?.data === 'string' && err.response.data.trim()) {
+        return err.response.data;
+    }
+    if (typeof err.message === 'string' && err.message.trim()) {
+        return err.message;
+    }
+
+    return 'Authentication failed';
+};
+
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
@@ -24,7 +50,7 @@ const Login = () => {
                 setError('Account created! Please login.');
             }
         } catch (err) {
-            setError(err.response?.data?.detail || 'Authentication failed');
+            setError(getAuthErrorMessage(err));
         } finally {
             setLoading(false);
         }

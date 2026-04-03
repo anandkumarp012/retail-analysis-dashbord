@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Shield, Palette, Layout, Save, Moon, Sun, Monitor } from 'lucide-react';
+import { User, Shield, Palette, Layout, Save, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Settings = () => {
@@ -11,7 +11,6 @@ const Settings = () => {
     const themes = [
         { id: 'dark', name: 'Premium Dark', icon: Moon, color: 'bg-slate-900' },
         { id: 'light', name: 'Clean Light', icon: Sun, color: 'bg-slate-50' },
-        { id: 'system', name: 'System Sync', icon: Monitor, color: 'bg-slate-500' },
     ];
 
     const accents = [
