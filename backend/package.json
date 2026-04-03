@@ -1,0 +1,11 @@
+{
+  "name": "retail-dashboard-backend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "FastAPI backend helper scripts",
+  "scripts": {
+    "build": "echo Backend is a Python FastAPI service; no npm build step is required.",
+    "dev": "python -m uvicorn main:app --reload",
+    "start": "python -m uvicorn main:app"
+  }
+}
