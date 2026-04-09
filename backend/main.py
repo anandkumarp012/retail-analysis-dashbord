@@ -20,7 +20,10 @@ app = FastAPI(title="RetailSight AI", version="2.1.0")
 USD_TO_INR = float(os.getenv("USD_TO_INR_RATE", "83.5"))
 FRONTEND_ORIGINS = [
     origin.strip()
-    for origin in os.getenv("FRONTEND_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
+    for origin in os.getenv(
+        "FRONTEND_ORIGINS",
+        "https://retail-analysis-dashbord-1.onrender.com,http://localhost:5173,http://localhost:3000",
+    ).split(",")
     if origin.strip()
 ]
 

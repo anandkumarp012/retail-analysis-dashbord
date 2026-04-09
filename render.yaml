@@ -8,3 +8,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.10.0"
+      - key: FRONTEND_ORIGINS
+        value: "https://retail-analysis-dashbord-1.onrender.com,http://localhost:5173,http://localhost:3000"
