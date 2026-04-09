@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, status, BackgroundTasks
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, status, BackgroundTasks, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -7,6 +7,7 @@ from pymongo.errors import AutoReconnect, ServerSelectionTimeoutError
 import pandas as pd
 import io
 import datetime
+import os
 from typing import List
 
 from database import get_database
@@ -15,6 +16,13 @@ import auth
 import ml_engine
 
 app = FastAPI(title="RetailSight AI", version="2.1.0")
+
+USD_TO_INR = float(os.getenv("USD_TO_INR_RATE", "83.5"))
+FRONTEND_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("FRONTEND_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
+    if origin.strip()
+]
 
 
 @app.exception_handler(ServerSelectionTimeoutError)
@@ -29,7 +37,7 @@ async def mongodb_exception_handler(request, exc):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=FRONTEND_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,9 +58,6 @@ async def signup(user_in: schemas.UserCreate, db: AsyncIOMotorDatabase = Depends
 
 @app.post("/api/auth/login", response_model=schemas.Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncIOMotorDatabase = Depends(get_database)):
-    if form_data.username == "admin" and form_data.password == "password123":
-        access_token = auth.create_access_token(data={"sub": "admin"})
-        return {"access_token": access_token, "token_type": "bearer"}
     user = await db.users.find_one({"username": form_data.username})
     if not user or not auth.verify_password(form_data.password, user["hashed_password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -68,11 +73,14 @@ async def upload_sales_data(
     current_user: str = Depends(auth.get_current_user)
 ):
     try:
+        if not (file.filename or "").lower().endswith(".csv"):
+            raise HTTPException(status_code=400, detail="Only CSV files are supported.")
+
         contents = await file.read()
         # Handle various encodings
         try:
             df = pd.read_csv(io.BytesIO(contents), encoding='utf-8-sig')
-        except:
+        except UnicodeDecodeError:
             df = pd.read_csv(io.BytesIO(contents), encoding='latin1')
             
         df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
@@ -137,11 +145,8 @@ async def upload_sales_data(
         sales_to_insert = []
         unique_pids = set()
 
-        # Pre-process dates flexibly
-        try:
-            df[final_mapping['date']] = pd.to_datetime(df[final_mapping['date']], dayfirst=False, errors='coerce')
-        except:
-            df[final_mapping['date']] = pd.to_datetime(df[final_mapping['date']], errors='coerce')
+        # Pre-process dates flexibly without throwing for malformed rows.
+        df[final_mapping['date']] = pd.to_datetime(df[final_mapping['date']], dayfirst=False, errors='coerce')
         
         df = df.dropna(subset=[final_mapping['date'], final_mapping['product_id']])
 
@@ -155,9 +160,8 @@ async def upload_sales_data(
             s = s.replace('$', '').replace('₹', '').replace('Rs.', '').replace(',', '').replace(' ', '').strip()
             try:
                 num = float(s)
-                # Convert to INR if it was in USD (approx rate 83.5)
-                return num * 83.5 if is_usd else num
-            except:
+                return num * USD_TO_INR if is_usd else num
+            except (ValueError, TypeError):
                 return 0.0
 
         for _, row in df.iterrows():
@@ -207,13 +211,25 @@ async def upload_sales_data(
         raise HTTPException(status_code=500, detail=f"Data Adapter Error: {str(e)}")
 
 @app.get("/api/data/products", response_model=List[schemas.Product])
-async def get_products(db: AsyncIOMotorDatabase = Depends(get_database), current_user: str = Depends(auth.get_current_user)):
-    return await db.products.find().to_list(100)
+async def get_products(
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=500),
+    db: AsyncIOMotorDatabase = Depends(get_database),
+    current_user: str = Depends(auth.get_current_user),
+):
+    cursor = db.products.find().skip(skip).limit(limit)
+    return await cursor.to_list(length=limit)
 
 @app.get("/api/forecast/{product_id}", response_model=List[schemas.Forecast])
-async def get_forecast(product_id: str, db: AsyncIOMotorDatabase = Depends(get_database), current_user: str = Depends(auth.get_current_user)):
-    cursor = db.forecasts.find({"product_id": str(product_id)}).sort("forecast_date", 1)
-    return await cursor.to_list(100)
+async def get_forecast(
+    product_id: str,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=500),
+    db: AsyncIOMotorDatabase = Depends(get_database),
+    current_user: str = Depends(auth.get_current_user),
+):
+    cursor = db.forecasts.find({"product_id": str(product_id)}).sort("forecast_date", 1).skip(skip).limit(limit)
+    return await cursor.to_list(length=limit)
 
 @app.post("/api/forecast/generate/{product_id}", response_model=List[schemas.Forecast])
 async def generate_forecast_endpoint(
@@ -291,7 +307,12 @@ async def get_dashboard_trends(db: AsyncIOMotorDatabase = Depends(get_database),
     return sorted(chart_data.values(), key=lambda x: x["name"])
 
 @app.get("/api/inventory/recommendations", response_model=List[schemas.Recommendation])
-async def get_all_recs(db: AsyncIOMotorDatabase = Depends(get_database), current_user: str = Depends(auth.get_current_user)):
+async def get_all_recs(
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=500),
+    db: AsyncIOMotorDatabase = Depends(get_database),
+    current_user: str = Depends(auth.get_current_user),
+):
     pipeline = [
         {"$sort": {"created_at": -1}}, # Latest first
         {"$group": {
@@ -315,7 +336,9 @@ async def get_all_recs(db: AsyncIOMotorDatabase = Depends(get_database), current
             "safety_stock": 1,
             "risk_level": 1,
             "created_at": 1
-        }}
+        }},
+        {"$skip": skip},
+        {"$limit": limit}
     ]
     cursor = db.recommendations.aggregate(pipeline)
-    return await cursor.to_list(100)
+    return await cursor.to_list(length=limit)
