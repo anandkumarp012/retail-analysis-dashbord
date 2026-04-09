@@ -8,7 +8,7 @@ const Inventory = () => {
 
     const fetchRecommendations = async () => {
         try {
-            const res = await axios.get('http://127.0.0.1:8000/api/inventory/recommendations');
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/inventory/recommendations');
             setRecommendations(res.data);
         } catch (e) {
             console.error("Failed to fetch inventory plan", e);

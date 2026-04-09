@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, status, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.errors import AutoReconnect, ServerSelectionTimeoutError
 import pandas as pd
 import io
 import datetime
@@ -13,6 +15,17 @@ import auth
 import ml_engine
 
 app = FastAPI(title="RetailSight AI", version="2.1.0")
+
+
+@app.exception_handler(ServerSelectionTimeoutError)
+@app.exception_handler(AutoReconnect)
+async def mongodb_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=503,
+        content={
+            "detail": "Database unavailable. Please verify MongoDB Atlas TLS/network settings and try again."
+        },
+    )
 
 app.add_middleware(
     CORSMiddleware,

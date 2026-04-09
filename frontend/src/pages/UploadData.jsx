@@ -23,7 +23,7 @@ const UploadData = () => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/data/upload', formData);
+            const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/data/upload', formData);
             setStatus('success');
 
             // Format mapping string for UI
@@ -36,7 +36,7 @@ const UploadData = () => {
 
             // Automatically trigger bulk forecast
             try {
-                await axios.post('http://127.0.0.1:8000/api/forecast/bulk');
+                await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/forecast/bulk');
                 setMessage(`Analysis Complete! ${response.data.message} Columns: ${mappingSummary}.`);
             } catch (aiErr) {
                 console.error("Auto-AI trigger failed", aiErr);
@@ -84,7 +84,7 @@ const UploadData = () => {
                         onClick={async () => {
                             if (window.confirm("This will delete all sales, products, and forecasts. Continue?")) {
                                 try {
-                                    await axios.post('http://127.0.0.1:8000/api/data/reset');
+                                    await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/data/reset');
                                     setMessage("Database cleared successfully!");
                                     setStatus('success');
                                 } catch (e) {

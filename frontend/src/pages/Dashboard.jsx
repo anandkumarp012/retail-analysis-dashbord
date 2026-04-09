@@ -33,9 +33,9 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             const [statsRes, trendsRes, recsRes] = await Promise.all([
-                axios.get('http://127.0.0.1:8000/api/dashboard/stats'),
-                axios.get('http://127.0.0.1:8000/api/dashboard/trends'),
-                axios.get('http://127.0.0.1:8000/api/inventory/recommendations')
+                axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/dashboard/stats'),
+                axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/dashboard/trends'),
+                axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/inventory/recommendations')
             ]);
             setStats(statsRes.data);
             setTrends(trendsRes.data);
@@ -54,7 +54,7 @@ const Dashboard = () => {
     const handleGenerateBulk = async () => {
         setGenerating(true);
         try {
-            await axios.post('http://127.0.0.1:8000/api/forecast/bulk');
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/forecast/bulk');
             await fetchData();
         } catch (e) {
             console.error(e);
