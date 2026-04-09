@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, AlertTriangle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
+import { withApiBase } from '../api';
 
 const KPICard = ({ title, value, change, trend, icon: Icon, color }) => (
     <div className="bg-card p-6 rounded-2xl border border-border shadow-lg relative overflow-hidden group">
@@ -33,9 +34,9 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             const [statsRes, trendsRes, recsRes] = await Promise.all([
-                axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/dashboard/stats'),
-                axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/dashboard/trends'),
-                axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/inventory/recommendations')
+                axios.get(withApiBase('/api/dashboard/stats')),
+                axios.get(withApiBase('/api/dashboard/trends')),
+                axios.get(withApiBase('/api/inventory/recommendations'))
             ]);
             setStats(statsRes.data);
             setTrends(trendsRes.data);
@@ -54,7 +55,7 @@ const Dashboard = () => {
     const handleGenerateBulk = async () => {
         setGenerating(true);
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/forecast/bulk');
+            await axios.post(withApiBase('/api/forecast/bulk'));
             await fetchData();
         } catch (e) {
             console.error(e);

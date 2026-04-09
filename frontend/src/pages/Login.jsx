@@ -7,7 +7,7 @@ const getAuthErrorMessage = (err) => {
 
     // Axios network errors usually mean backend is not running/reachable.
     if (err.code === 'ERR_NETWORK' || (err.message && err.message.toLowerCase().includes('network error'))) {
-        return 'Cannot reach backend at 127.0.0.1:8000. Start the FastAPI server and try again.';
+        return 'Cannot reach backend API. Verify VITE_API_URL and ensure the backend server is running.';
     }
 
     const detail = err.response?.data?.detail;

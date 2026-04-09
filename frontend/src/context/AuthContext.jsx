@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { withApiBase } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -36,7 +37,7 @@ export const AuthProvider = ({ children }) => {
         params.append('username', username);
         params.append('password', password);
 
-        const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/auth/login', params);
+        const response = await axios.post(withApiBase('/api/auth/login'), params);
         const { access_token } = response.data;
 
         localStorage.setItem('token', access_token);
@@ -46,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signup = async (username, email, password) => {
-        await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/auth/signup', { username, email, password });
+        await axios.post(withApiBase('/api/auth/signup'), { username, email, password });
     };
 
     const logout = () => {

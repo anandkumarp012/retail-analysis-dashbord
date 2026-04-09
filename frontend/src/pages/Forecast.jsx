@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart } from 'recharts';
 import { Zap, Activity } from 'lucide-react';
+import { withApiBase } from '../api';
 
 const Forecast = () => {
     const [products, setProducts] = useState([]);
@@ -22,7 +23,7 @@ const Forecast = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}` + '/api/data/products');
+            const res = await axios.get(withApiBase('/api/data/products'));
             setProducts(res.data);
             if (res.data.length > 0 && !selectedProduct) {
                 setSelectedProduct(res.data[0].product_id);
@@ -35,7 +36,7 @@ const Forecast = () => {
     const fetchExistingForecast = async () => {
         setFetching(true);
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/forecast/${selectedProduct}`);
+            const res = await axios.get(withApiBase(`/api/forecast/${selectedProduct}`));
             if (res.data.length > 0) {
                 formatAndSetData(res.data);
             } else {
@@ -63,7 +64,7 @@ const Forecast = () => {
         if (!selectedProduct) return;
         setLoading(true);
         try {
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/forecast/generate/${selectedProduct}`);
+            const res = await axios.post(withApiBase(`/api/forecast/generate/${selectedProduct}`));
             formatAndSetData(res.data);
         } catch (err) {
             console.error("Forecast failed", err);
